@@ -1,12 +1,25 @@
 {
   "name": "jinja2-enhanced-shared",
-  "version": "0.0.0",
-  "description": "Shared functions for free and pro Jinja2 Enhanced ",
-  "license": "ISC",
-  "author": "",
+  "version": "0.1.0",
+  "description": "Shared pure utilities used by the Jinja2 Enhance free and Pro VS Code extensions.",
+  "license": "MIT",
+  "author": "Xubylele",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xubylele/jinja2-html-shared.git"
+  },
   "type": "commonjs",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepare": "npm run clean && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
   }
 }
