@@ -17,9 +17,13 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build"
+    "prepare": "npm run clean && npm run build",
+    "changeset": "changeset",
+    "changeset:check": "node -e \"const f=require('fs').readdirSync('.changeset').filter(n=>n.endsWith('.md')&&n!=='README.md');if(!f.length){process.stderr.write('No changeset found. Run: npm run changeset\\n');process.exit(1)}else{console.log('Changesets found:',f.join(', '))}\"",
+    "version": "changeset version && npm install"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "typescript": "^6.0.3"
   }
 }

@@ -36,12 +36,22 @@ Pure utility package — regex helpers over Jinja2 template strings — consumed
 
 ## Releasing
 
+Versioning is automated via [Changesets](https://github.com/changesets/changesets) — same flow as the free and Pro repos.
+
 ```bash
-# bump version in package.json, then
-git tag v0.1.1 && git push --tags
+# 1. While developing, record the change
+npm run changeset           # interactive: pick bump (patch/minor/major) + summary
+                            # writes .changeset/<random>.md (commit it)
+
+# 2. When ready to cut a release
+npm run version             # consumes pending changesets → bumps package.json + CHANGELOG.md
+git commit -am "🔧 release"
+git tag v$(node -p "require('./package.json').version") && git push --tags
 ```
 
-Consumers update via `npm install git+ssh://git@github.com/xubylele/jinja2-html-shared.git#v0.1.1`.
+`npm run changeset:check` fails CI when a PR has no pending changeset.
+
+Consumers update via `npm install git+ssh://git@github.com/xubylele/jinja2-html-shared.git#v<new-tag>`.
 
 ## Commit Convention
 
