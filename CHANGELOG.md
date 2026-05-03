@@ -1,5 +1,18 @@
 # jinja2-enhanced-shared
 
+## 0.3.0
+
+### Minor Changes
+
+- ✨ Add template-relation analyzers for Cross-File Variable Tracking
+
+  - `scanTemplateRelations(text)` — extracts `{% extends %}`, `{% include %}`, `{% import … as … %}`, and `{% from … import … %}` occurrences with offsets.
+  - `extractMacroDefinitions(text)` — extracts `{% macro name(params) %}` definitions; also feeds the upcoming Macro IntelliSense feature.
+  - `resolveTemplatePath(rel, fromAbs, roots)` — pure path resolution returning candidate absolute paths in priority order (no I/O).
+  - New types: `TemplateRelations`, `TemplatePathOccurrence`, `TemplateImportOccurrence`, `TemplateImportKind`, `TemplateImportName`, `MacroDefinition`, `MacroParam`.
+
+  🧪 First test suite in the package — covers the new analyzers and `resolveTemplatePath` edge cases (Windows paths, trailing slashes, dedupe, empty inputs). Closes the "no tests yet" gap noted in `docs/architecture.md`.
+
 ## 0.2.0
 
 ### Minor Changes

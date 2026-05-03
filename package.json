@@ -1,6 +1,6 @@
 {
   "name": "@xubylele/jinja2-enhanced-shared",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Shared pure utilities used by the Jinja2 Enhance free and Pro VS Code extensions.",
   "license": "MIT",
   "author": "Xubylele",
@@ -21,12 +21,20 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "prepare": "npm run clean && npm run build",
+    "test": "jest --runInBand",
+    "test:ci": "jest --runInBand --ci",
     "changeset": "changeset",
     "changeset:check": "node -e \"const f=require('fs').readdirSync('.changeset').filter(n=>n.endsWith('.md')&&n!=='README.md');if(!f.length){process.stderr.write('No changeset found. Run: npm run changeset\\n');process.exit(1)}else{console.log('Changesets found:',f.join(', '))}\"",
     "version": "changeset version && npm install"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-typescript": "^7.28.5",
     "@changesets/cli": "^2.31.0",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.3.0",
+    "jest": "^30.3.0",
     "typescript": "^6.0.3"
   }
 }
