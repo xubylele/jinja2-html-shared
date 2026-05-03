@@ -1,5 +1,5 @@
 {
-  "name": "jinja2-enhanced-shared",
+  "name": "@xubylele/jinja2-enhanced-shared",
   "version": "0.2.0",
   "description": "Shared pure utilities used by the Jinja2 Enhance free and Pro VS Code extensions.",
   "license": "MIT",
@@ -7,6 +7,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xubylele/jinja2-html-shared.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "type": "commonjs",
   "main": "dist/index.js",
