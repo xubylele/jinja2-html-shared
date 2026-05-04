@@ -10,6 +10,10 @@ export type { BackendLang, BackendVarOccurrence } from './backendScanner';
 export {
   scanTemplateRelations,
   extractMacroDefinitions,
+  extractBlockDefinitions,
+  extractMacroCalls,
+  calculateNestingDepth,
+  isVariableUsed,
 } from './templateRelations';
 export type {
   TemplateRelations,
@@ -19,5 +23,7 @@ export type {
   TemplateImportName,
   MacroDefinition,
   MacroParam,
+  BlockDefinition,
+  MacroCall,
 } from './templateRelations';
 export { resolveTemplatePath } from './templatePath';

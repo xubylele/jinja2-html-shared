@@ -44,12 +44,44 @@ export interface MacroDefinition {
   nameLength: number;
 }
 
+export interface BlockDefinition {
+  name: string;
+  /** Offset of the `{% block %}` opening tag. */
+  blockOffset: number;
+  /** Length of the full `{% block name %}` tag. */
+  blockLength: number;
+  /** Offset of the block name identifier. */
+  nameOffset: number;
+  /** Length of the block name. */
+  nameLength: number;
+  /** Offset of the `{% endblock %}` tag, or -1 if not found. */
+  endblockOffset: number;
+  /** Length of the `{% endblock %}` tag, or 0 if not found. */
+  endblockLength: number;
+}
+
+export interface MacroCall {
+  name: string;
+  /** Argument strings (before trimming/parsing). May be empty strings for unnamed args. */
+  args: string[];
+  /** Offset of the macro name in the source text. */
+  nameOffset: number;
+  /** Length of the macro name. */
+  nameLength: number;
+  /** Offset of the opening `(` in the call. */
+  callOffset: number;
+}
+
 export interface TemplateRelations {
   /** First `{% extends %}` in the file. Jinja2 only honors one per template. */
   extends: TemplatePathOccurrence | null;
   includes: TemplatePathOccurrence[];
   imports: TemplateImportOccurrence[];
   macros: MacroDefinition[];
+  /** `{% block %}…{% endblock %}` pairs. */
+  blocks: BlockDefinition[];
+  /** `{{ macroName(args) }}` calls (excluding macro definitions themselves). */
+  macroCalls: MacroCall[];
 }
 
 const EXTENDS_RE = /\{%-?\s*extends\s+(['"])([^'"]+)\1\s*-?%\}/g;
@@ -57,14 +89,19 @@ const INCLUDE_RE = /\{%-?\s*include\s+(['"])([^'"]+)\1[^%]*?-?%\}/g;
 const IMPORT_RE = /\{%-?\s*import\s+(['"])([^'"]+)\1\s+as\s+([A-Za-z_]\w*)\s*-?%\}/g;
 const FROM_IMPORT_RE = /\{%-?\s*from\s+(['"])([^'"]+)\1\s+import\s+([^%]+?)\s*-?%\}/g;
 const MACRO_RE = /\{%-?\s*macro\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*-?%\}/g;
+const BLOCK_RE = /\{%-?\s*block\s+([A-Za-z_]\w*)\s*-?%\}/g;
+const ENDBLOCK_RE = /\{%-?\s*endblock(?:\s+([A-Za-z_]\w*))?\s*-?%\}/g;
+const MACRO_CALL_RE = /\{\{\s*([A-Za-z_]\w*)\s*\(/g;
 
-/** Scan a template string for inheritance, includes, imports, and macros. */
+/** Scan a template string for inheritance, includes, imports, macros, blocks, and macro calls. */
 export function scanTemplateRelations(text: string): TemplateRelations {
   return {
     extends: scanExtends(text),
     includes: scanIncludes(text),
     imports: scanImports(text),
     macros: extractMacroDefinitions(text),
+    blocks: extractBlockDefinitions(text),
+    macroCalls: extractMacroCalls(text),
   };
 }
 
@@ -171,4 +208,207 @@ function parseMacroParams(body: string): MacroParam[] {
       return { name: nameMatch[1], hasDefault: eq >= 0 };
     })
     .filter((p): p is MacroParam => p !== null);
+}
+
+/**
+ * Parse `{% block name %}…{% endblock %}` pairs.
+ * Captures block name, offsets for the opening and closing tags, and the name offset.
+ * Uses a stack-based approach to handle nested blocks correctly.
+ */
+export function extractBlockDefinitions(text: string): BlockDefinition[] {
+  const out: BlockDefinition[] = [];
+  const stack: Array<{
+    name: string;
+    blockOffset: number;
+    blockLength: number;
+    nameOffset: number;
+    nameLength: number;
+  }> = [];
+
+  const blockRe = /\{%-?\s*block\s+([A-Za-z_]\w*)\s*-?%\}/g;
+  const endblockRe = /\{%-?\s*endblock(?:\s+([A-Za-z_]\w*))?\s*-?%\}/g;
+
+  let m: RegExpExecArray | null;
+
+  // Collect all tags with their positions
+  const tags: Array<{
+    type: 'block' | 'endblock';
+    name: string;
+    offset: number;
+    length: number;
+  }> = [];
+
+  blockRe.lastIndex = 0;
+  while ((m = blockRe.exec(text)) !== null) {
+    tags.push({ type: 'block', name: m[1], offset: m.index, length: m[0].length });
+  }
+
+  endblockRe.lastIndex = 0;
+  while ((m = endblockRe.exec(text)) !== null) {
+    tags.push({ type: 'endblock', name: m[1] || '', offset: m.index, length: m[0].length });
+  }
+
+  // Sort by offset to process in document order
+  tags.sort((a, b) => a.offset - b.offset);
+
+  for (const tag of tags) {
+    if (tag.type === 'block') {
+      const nameLocal = text.indexOf(tag.name, tag.offset + 1);
+      stack.push({
+        name: tag.name,
+        blockOffset: tag.offset,
+        blockLength: tag.length,
+        nameOffset: nameLocal,
+        nameLength: tag.name.length,
+      });
+    } else {
+      // endblock: pop from stack (LIFO)
+      let found = tag.name
+        ? stack.reverse().find(s => s.name === tag.name)
+        : stack.pop();
+      if (found) {
+        const idx = stack.indexOf(found);
+        if (idx >= 0) { stack.splice(idx, 1); }
+        out.push({
+          name: found.name,
+          blockOffset: found.blockOffset,
+          blockLength: found.blockLength,
+          nameOffset: found.nameOffset,
+          nameLength: found.nameLength,
+          endblockOffset: tag.offset,
+          endblockLength: tag.length,
+        });
+      }
+    }
+  }
+
+  // Any unclosed blocks
+  for (const blk of stack) {
+    out.push({
+      name: blk.name,
+      blockOffset: blk.blockOffset,
+      blockLength: blk.blockLength,
+      nameOffset: blk.nameOffset,
+      nameLength: blk.nameLength,
+      endblockOffset: -1,
+      endblockLength: 0,
+    });
+  }
+
+  return out;
+}
+
+/**
+ * Parse `{{ macroName(arg1, arg2) }}` calls, excluding macro definitions themselves.
+ * Captures macro name, argument strings (raw, before trimming), and offsets.
+ */
+export function extractMacroCalls(text: string): MacroCall[] {
+  const out: MacroCall[] = [];
+  const seen = new Set<number>();
+
+  // Collect macro definition offsets to skip them
+  const defRe = /\{%-?\s*macro\s+([A-Za-z_]\w*)\s*\(/g;
+  let dm: RegExpExecArray | null;
+  while ((dm = defRe.exec(text)) !== null) {
+    seen.add(dm.index);
+  }
+
+  const callRe = /\{\{\s*([A-Za-z_]\w*)\s*\(/g;
+  let m: RegExpExecArray | null;
+  while ((m = callRe.exec(text)) !== null) {
+    if (seen.has(m.index)) { continue; }
+    const name = m[1];
+    const callOffset = m.index + m[0].lastIndexOf('(');
+    // Extract arguments between ( and matching )
+    const args = extractArgs(text, callOffset);
+    const nameLocal = m[0].indexOf(name);
+    out.push({
+      name,
+      args,
+      nameOffset: m.index + nameLocal,
+      nameLength: name.length,
+      callOffset,
+    });
+  }
+  return out;
+}
+
+function extractArgs(text: string, parenOffset: number): string[] {
+  let depth = 0;
+  let i = parenOffset;
+  const args: string[] = [];
+  let current = '';
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === '(') { depth++; if (depth > 1) { current += ch; } }
+    else if (ch === ')') {
+      depth--;
+      if (depth === 0) { if (current.trim()) { args.push(current.trim()); } break; }
+      current += ch;
+    } else if (ch === ',' && depth === 1) {
+      args.push(current.trim());
+      current = '';
+    } else {
+      current += ch;
+    }
+    i++;
+  }
+  return args;
+}
+
+/**
+ * Calculate the maximum nesting depth of Jinja2 block-level tags
+ * ({% if %}, {% for %}, {% block %}, {% macro %}).
+ * Returns the depth (>= 0). Useful for lint rule JHE1202.
+ */
+export function calculateNestingDepth(text: string): number {
+  const openRe = /\{%-?\s*(if|for|block|macro)\b/g;
+  const closeRe = /\{%-?\s*end(if|for|block|macro)\b/g;
+  let maxDepth = 0;
+  let depth = 0;
+  let m: RegExpExecArray | null;
+
+  // Collect all open and close tags with positions
+  const tags: { offset: number; type: 'open' | 'close' }[] = [];
+
+  openRe.lastIndex = 0;
+  while ((m = openRe.exec(text)) !== null) {
+    tags.push({ offset: m.index, type: 'open' });
+  }
+
+  closeRe.lastIndex = 0;
+  while ((m = closeRe.exec(text)) !== null) {
+    tags.push({ offset: m.index, type: 'close' });
+  }
+
+  // Sort by offset to process in document order
+  tags.sort((a, b) => a.offset - b.offset);
+
+  for (const tag of tags) {
+    if (tag.type === 'open') {
+      depth++;
+      if (depth > maxDepth) { maxDepth = depth; }
+    } else {
+      if (depth > 0) { depth--; }
+    }
+  }
+
+  return maxDepth;
+}
+
+/**
+ * Check if a variable name appears to be "used" in the template text.
+ * Looks for usage in {{ ... }}, as a loop variable, or in expressions.
+ * Returns true if the variable name is found in relevant contexts.
+ */
+export function isVariableUsed(text: string, varName: string): boolean {
+  const escaped = varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // Match as a standalone identifier in {{ ... }}, {% ... %}, or as a for-loop var
+  const re = new RegExp(
+    '({{[^}]*\\b' + escaped + '\\b[^}]*}})|' +
+    '({%[^%]*\\b' + escaped + '\\b[^%]*%})|' +
+    '({%\s*for\s+' + escaped + '\\s+in\\b)',
+    'g',
+  );
+  return re.test(text);
 }
