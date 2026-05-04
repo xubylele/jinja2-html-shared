@@ -1,5 +1,11 @@
 # jinja2-enhanced-shared
 
+## 0.3.2
+
+### Patch Changes
+
+- d1ffea9: Add pure parsers for advanced linting rules: extractBlockDefinitions, extractMacroCalls, calculateNestingDepth, isVariableUsed
+
 ## 0.3.1
 
 ### Patch Changes
