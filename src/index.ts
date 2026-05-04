@@ -4,6 +4,7 @@ export {
   scanBackendOccurrences,
   normalizeTemplateKey,
   identifierAtOffset,
+  filterAtOffset,
 } from './backendScanner';
 export type { BackendLang, BackendVarOccurrence } from './backendScanner';
 export {

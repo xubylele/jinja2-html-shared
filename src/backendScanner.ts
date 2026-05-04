@@ -218,6 +218,28 @@ export function identifierAtOffset(
   return { name: text.slice(start, end), offset: start, length: end - start };
 }
 
+/**
+ * Detect if the identifier at `offset` is a Jinja2 filter name (preceded by `|`).
+ * Returns the identifier info if it's a filter, null otherwise.
+ * Reuses `identifierAtOffset()` and checks for `|` in the same expression.
+ */
+export function filterAtOffset(
+  text: string,
+  offset: number,
+): { name: string; offset: number; length: number } | null {
+  const ident = identifierAtOffset(text, offset);
+  if (!ident) { return null; }
+
+  // Scan backwards from the identifier to find `|` in the same expression.
+  let i = ident.offset - 1;
+  while (i >= 0 && /\s/.test(text[i])) { i--; }
+
+  // Must find `|` before hitting the start of the expression or closing delimiter.
+  if (i < 0 || text[i] !== '|') { return null; }
+
+  return ident;
+}
+
 /** Returns true if `offset` falls inside a `{{ ... }}` or `{% ... %}` block. */
 function isInsideJinjaExpr(text: string, offset: number): boolean {
   // Find the nearest opening token before offset.
