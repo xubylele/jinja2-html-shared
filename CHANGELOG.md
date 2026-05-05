@@ -1,5 +1,11 @@
 # jinja2-enhanced-shared
 
+## 0.4.1
+
+### Patch Changes
+
+- Fix template renderer: add `now()` helper support, fix `{% set %}` tag processing, and improve error handling in `renderTemplate()`.
+
 ## 0.4.0
 
 ### Minor Changes

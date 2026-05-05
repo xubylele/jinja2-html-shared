@@ -11,13 +11,6 @@ export interface RenderOptions {
   highlightMissing?: boolean;
 }
 
-function createMissingVarTracker(): {
-  missing: Set<string>;
-} {
-  const missing = new Set<string>();
-  return { missing };
-}
-
 function extractTemplateVariables(content: string): string[] {
   const varRegex = /\{\{\s*([\w.]+)\s*\}\}/g;
   const setRegex = /\{%-?\s*set\s+(\w+)\s*=/g;
@@ -53,6 +46,17 @@ export function findMissingVariables(
   return used.filter((v) => !(v in context));
 }
 
+function addJinjaHelpers(context: Record<string, unknown>): Record<string, unknown> {
+  const enriched = { ...context };
+
+  // Add common Jinja2 globals if not already provided
+  if (!('now' in enriched)) {
+    enriched['now'] = () => new Date();
+  }
+
+  return enriched;
+}
+
 export function renderTemplate(
   content: string,
   context: Record<string, unknown>,
@@ -63,7 +67,7 @@ export function renderTemplate(
 
   const env = new nunjucks.Environment(null, { throwOnUndefined: false });
 
-  const safeContext: Record<string, unknown> = { ...context };
+  const safeContext: Record<string, unknown> = addJinjaHelpers({ ...context });
   for (const v of missing) {
     if (highlightMissing) {
       safeContext[v] = `<<MISSING:${v}>>`;
