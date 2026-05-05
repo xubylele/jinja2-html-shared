@@ -1,6 +1,6 @@
 {
   "name": "@xubylele/jinja2-enhanced-shared",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Shared pure utilities used by the Jinja2 Enhance free and Pro VS Code extensions.",
   "license": "MIT",
   "author": "Xubylele",
@@ -29,12 +29,16 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-env": "^7.29.5",
     "@babel/preset-typescript": "^7.28.5",
     "@changesets/cli": "^2.31.0",
     "@types/jest": "^30.0.0",
+    "@types/nunjucks": "^3.2.6",
     "babel-jest": "^30.3.0",
     "jest": "^30.3.0",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "nunjucks": "^3.2.4"
   }
 }

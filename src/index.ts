@@ -27,3 +27,8 @@ export type {
   MacroCall,
 } from './templateRelations';
 export { resolveTemplatePath } from './templatePath';
+export {
+  renderTemplate,
+  findMissingVariables,
+} from './templateRenderer';
+export type { RenderResult, RenderOptions } from './templateRenderer';

@@ -1,5 +1,11 @@
 # jinja2-enhanced-shared
 
+## 0.4.0
+
+### Minor Changes
+
+- Add template renderer engine using Nunjucks with Jinja2 compatibility mode. Includes renderTemplate() and findMissingVariables() functions for rendering Jinja2 templates and detecting missing variables.
+
 ## 0.3.2
 
 ### Patch Changes
