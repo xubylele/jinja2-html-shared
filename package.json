@@ -8,9 +8,6 @@
     "type": "git",
     "url": "git+https://github.com/xubylele/jinja2-html-shared.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,7 +22,8 @@
     "test:ci": "jest --runInBand --ci",
     "changeset": "changeset",
     "changeset:check": "node -e \"const f=require('fs').readdirSync('.changeset').filter(n=>n.endsWith('.md')&&n!=='README.md');if(!f.length){process.stderr.write('No changeset found. Run: npm run changeset\\n');process.exit(1)}else{console.log('Changesets found:',f.join(', '))}\"",
-    "version": "changeset version && npm install"
+    "version": "changeset version && npm install",
+    "publish:public": "npm publish --access public"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

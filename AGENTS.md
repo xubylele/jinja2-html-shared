@@ -9,10 +9,10 @@
 
 ## Publishing
 
-- Published to GitHub Packages (`npm.pkg.github.com`), not npmjs.com
-- Requires `NODE_AUTH_TOKEN` env var (see `.npmrc`)
-- Consumers install via git SSH URL with tag: `git+ssh://git@github.com/xubylele/jinja2-html-shared.git#v0.1.0`
-- Versioning via changesets: `npm run changeset` to create, `npm run version` to apply
+- Published to npmjs.com: `@xubylele/jinja2-enhanced-shared`
+- Uses [Changesets](https://github.com/changesets/changesets) for versioning
+- Consumers install via npm: `npm install @xubylele/jinja2-enhanced-shared`
+- GitHub Actions publish to npmjs.com on tag push (OIDC Trusted Publisher)
 
 ## Structure
 
@@ -25,3 +25,4 @@
 
 - `prepare` script runs automatically on `npm install` — cleans and rebuilds `dist/`
 - No ESLint, Prettier, or separate typecheck step configured
+- Backend scanner logic (pro-only) moved to `jinja2-html-enhancer-pro/src/intelligence/`
