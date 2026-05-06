@@ -2,7 +2,12 @@
 // Returns a list of candidate absolute paths in priority order; the caller
 // (Pro extension) probes the filesystem to pick the first that exists.
 
-import { normalizeTemplateKey } from './backendScanner';
+function normalizeTemplateKey(raw: string): string {
+  let s = raw.replace(/\\/g, '/');
+  while (s.startsWith('./')) { s = s.slice(2); }
+  while (s.startsWith('/')) { s = s.slice(1); }
+  return s;
+}
 
 /**
  * Compute candidate absolute paths for a template path written in
