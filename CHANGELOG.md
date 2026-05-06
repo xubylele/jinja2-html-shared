@@ -1,5 +1,11 @@
 # jinja2-enhanced-shared
 
+## 0.4.2
+
+### Patch Changes
+
+- d917eff: Remove pro-only backendScanner module from shared package. The backend scanning logic (scanBackendOccurrences, identifierAtOffset, filterAtOffset, normalizeTemplateKey) is now moved to the pro extension's local src/intelligence/ directory. Shared package now only contains utilities used by both free and pro extensions.
+
 ## 0.4.1
 
 ### Patch Changes
