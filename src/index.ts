@@ -36,3 +36,11 @@ export {
   identifierAtOffset,
 } from './filterParser';
 export type { IdentifierMatch } from './filterParser';
+export {
+  formatMacroSignatureLabel,
+  formatMacroSnippet,
+  parseMacroCallContext,
+  isInPrintContext,
+  computeActiveParameter,
+} from './macro-intellisense';
+export type { MacroCallContext } from './macro-intellisense';
