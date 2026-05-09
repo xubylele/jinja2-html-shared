@@ -25,3 +25,14 @@ export {
   findMissingVariables,
 } from './templateRenderer';
 export type { RenderResult, RenderOptions } from './templateRenderer';
+export {
+  FILTER_DOCS,
+  getFilterDoc,
+  listFilterNames,
+} from './filterDocs';
+export type { FilterDoc } from './filterDocs';
+export {
+  filterAtOffset,
+  identifierAtOffset,
+} from './filterParser';
+export type { IdentifierMatch } from './filterParser';
