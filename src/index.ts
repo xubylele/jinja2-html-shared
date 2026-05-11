@@ -23,8 +23,13 @@ export { resolveTemplatePath } from './templatePath';
 export {
   renderTemplate,
   findMissingVariables,
+  findUsedVariables,
 } from './templateRenderer';
-export type { RenderResult, RenderOptions } from './templateRenderer';
+export type {
+  RenderResult,
+  RenderOptions,
+  PlaceholderMode,
+} from './templateRenderer';
 export {
   FILTER_DOCS,
   getFilterDoc,
