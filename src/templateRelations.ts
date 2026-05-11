@@ -20,7 +20,7 @@ export interface TemplateImportName {
   alias?: string;
 }
 
-export type TemplateImportKind = 'import' | 'from';
+export type TemplateImportKind = "import" | "from";
 
 export interface TemplateImportOccurrence extends TemplatePathOccurrence {
   kind: TemplateImportKind;
@@ -108,7 +108,9 @@ export function scanTemplateRelations(text: string): TemplateRelations {
 function scanExtends(text: string): TemplatePathOccurrence | null {
   EXTENDS_RE.lastIndex = 0;
   const m = EXTENDS_RE.exec(text);
-  if (!m) { return null; }
+  if (!m) {
+    return null;
+  }
   return buildPathOccurrence(m, text, m[2]);
 }
 
@@ -129,13 +131,13 @@ function scanImports(text: string): TemplateImportOccurrence[] {
   let m: RegExpExecArray | null;
   while ((m = IMPORT_RE.exec(text)) !== null) {
     const base = buildPathOccurrence(m, text, m[2]);
-    out.push({ ...base, kind: 'import', alias: m[3] });
+    out.push({ ...base, kind: "import", alias: m[3] });
   }
 
   FROM_IMPORT_RE.lastIndex = 0;
   while ((m = FROM_IMPORT_RE.exec(text)) !== null) {
     const base = buildPathOccurrence(m, text, m[2]);
-    out.push({ ...base, kind: 'from', names: parseImportNames(m[3]) });
+    out.push({ ...base, kind: "from", names: parseImportNames(m[3]) });
   }
 
   return out;
@@ -149,7 +151,7 @@ export function extractMacroDefinitions(text: string): MacroDefinition[] {
   while ((m = MACRO_RE.exec(text)) !== null) {
     const name = m[1];
     const paramsBody = m[2];
-    const nameLocal = m[0].indexOf(name, m[0].indexOf('macro') + 5);
+    const nameLocal = m[0].indexOf(name, m[0].indexOf("macro") + 5);
     out.push({
       name,
       params: parseMacroParams(paramsBody),
@@ -163,7 +165,7 @@ export function extractMacroDefinitions(text: string): MacroDefinition[] {
 function buildPathOccurrence(
   match: RegExpExecArray,
   text: string,
-  rawPath: string,
+  rawPath: string
 ): TemplatePathOccurrence {
   const tagOffset = match.index;
   const tagLength = match[0].length;
@@ -181,7 +183,7 @@ function buildPathOccurrence(
 
 function parseImportNames(body: string): TemplateImportName[] {
   return body
-    .split(',')
+    .split(",")
     .map((part) => part.trim())
     .filter((part) => part.length > 0)
     .map((part) => {
@@ -197,14 +199,16 @@ function parseImportNames(body: string): TemplateImportName[] {
 
 function parseMacroParams(body: string): MacroParam[] {
   return body
-    .split(',')
+    .split(",")
     .map((part) => part.trim())
     .filter((part) => part.length > 0)
     .map((part) => {
-      const eq = part.indexOf('=');
+      const eq = part.indexOf("=");
       const rawName = (eq >= 0 ? part.slice(0, eq) : part).trim();
       const nameMatch = rawName.match(/^([A-Za-z_]\w*)$/);
-      if (!nameMatch) { return null; }
+      if (!nameMatch) {
+        return null;
+      }
       return { name: nameMatch[1], hasDefault: eq >= 0 };
     })
     .filter((p): p is MacroParam => p !== null);
@@ -232,7 +236,7 @@ export function extractBlockDefinitions(text: string): BlockDefinition[] {
 
   // Collect all tags with their positions
   const tags: Array<{
-    type: 'block' | 'endblock';
+    type: "block" | "endblock";
     name: string;
     offset: number;
     length: number;
@@ -240,19 +244,19 @@ export function extractBlockDefinitions(text: string): BlockDefinition[] {
 
   blockRe.lastIndex = 0;
   while ((m = blockRe.exec(text)) !== null) {
-    tags.push({ type: 'block', name: m[1], offset: m.index, length: m[0].length });
+    tags.push({ type: "block", name: m[1], offset: m.index, length: m[0].length });
   }
 
   endblockRe.lastIndex = 0;
   while ((m = endblockRe.exec(text)) !== null) {
-    tags.push({ type: 'endblock', name: m[1] || '', offset: m.index, length: m[0].length });
+    tags.push({ type: "endblock", name: m[1] || "", offset: m.index, length: m[0].length });
   }
 
   // Sort by offset to process in document order
   tags.sort((a, b) => a.offset - b.offset);
 
   for (const tag of tags) {
-    if (tag.type === 'block') {
+    if (tag.type === "block") {
       const nameLocal = text.indexOf(tag.name, tag.offset + 1);
       stack.push({
         name: tag.name,
@@ -263,12 +267,12 @@ export function extractBlockDefinitions(text: string): BlockDefinition[] {
       });
     } else {
       // endblock: pop from stack (LIFO)
-      let found = tag.name
-        ? stack.reverse().find(s => s.name === tag.name)
-        : stack.pop();
+      let found = tag.name ? stack.reverse().find((s) => s.name === tag.name) : stack.pop();
       if (found) {
         const idx = stack.indexOf(found);
-        if (idx >= 0) { stack.splice(idx, 1); }
+        if (idx >= 0) {
+          stack.splice(idx, 1);
+        }
         out.push({
           name: found.name,
           blockOffset: found.blockOffset,
@@ -316,9 +320,11 @@ export function extractMacroCalls(text: string): MacroCall[] {
   const callRe = /\{\{\s*([A-Za-z_]\w*)\s*\(/g;
   let m: RegExpExecArray | null;
   while ((m = callRe.exec(text)) !== null) {
-    if (seen.has(m.index)) { continue; }
+    if (seen.has(m.index)) {
+      continue;
+    }
     const name = m[1];
-    const callOffset = m.index + m[0].lastIndexOf('(');
+    const callOffset = m.index + m[0].lastIndexOf("(");
     // Extract arguments between ( and matching )
     const args = extractArgs(text, callOffset);
     const nameLocal = m[0].indexOf(name);
@@ -337,17 +343,26 @@ function extractArgs(text: string, parenOffset: number): string[] {
   let depth = 0;
   let i = parenOffset;
   const args: string[] = [];
-  let current = '';
+  let current = "";
   while (i < text.length) {
     const ch = text[i];
-    if (ch === '(') { depth++; if (depth > 1) { current += ch; } }
-    else if (ch === ')') {
+    if (ch === "(") {
+      depth++;
+      if (depth > 1) {
+        current += ch;
+      }
+    } else if (ch === ")") {
       depth--;
-      if (depth === 0) { if (current.trim()) { args.push(current.trim()); } break; }
+      if (depth === 0) {
+        if (current.trim()) {
+          args.push(current.trim());
+        }
+        break;
+      }
       current += ch;
-    } else if (ch === ',' && depth === 1) {
+    } else if (ch === "," && depth === 1) {
       args.push(current.trim());
-      current = '';
+      current = "";
     } else {
       current += ch;
     }
@@ -369,27 +384,31 @@ export function calculateNestingDepth(text: string): number {
   let m: RegExpExecArray | null;
 
   // Collect all open and close tags with positions
-  const tags: { offset: number; type: 'open' | 'close' }[] = [];
+  const tags: { offset: number; type: "open" | "close" }[] = [];
 
   openRe.lastIndex = 0;
   while ((m = openRe.exec(text)) !== null) {
-    tags.push({ offset: m.index, type: 'open' });
+    tags.push({ offset: m.index, type: "open" });
   }
 
   closeRe.lastIndex = 0;
   while ((m = closeRe.exec(text)) !== null) {
-    tags.push({ offset: m.index, type: 'close' });
+    tags.push({ offset: m.index, type: "close" });
   }
 
   // Sort by offset to process in document order
   tags.sort((a, b) => a.offset - b.offset);
 
   for (const tag of tags) {
-    if (tag.type === 'open') {
+    if (tag.type === "open") {
       depth++;
-      if (depth > maxDepth) { maxDepth = depth; }
+      if (depth > maxDepth) {
+        maxDepth = depth;
+      }
     } else {
-      if (depth > 0) { depth--; }
+      if (depth > 0) {
+        depth--;
+      }
     }
   }
 
@@ -402,13 +421,19 @@ export function calculateNestingDepth(text: string): number {
  * Returns true if the variable name is found in relevant contexts.
  */
 export function isVariableUsed(text: string, varName: string): boolean {
-  const escaped = varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escaped = varName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   // Match as a standalone identifier in {{ ... }}, {% ... %}, or as a for-loop var
   const re = new RegExp(
-    '({{[^}]*\\b' + escaped + '\\b[^}]*}})|' +
-    '({%[^%]*\\b' + escaped + '\\b[^%]*%})|' +
-    '({%\s*for\s+' + escaped + '\\s+in\\b)',
-    'g',
+    "({{[^}]*\\b" +
+      escaped +
+      "\\b[^}]*}})|" +
+      "({%[^%]*\\b" +
+      escaped +
+      "\\b[^%]*%})|" +
+      "({%\s*for\s+" +
+      escaped +
+      "\\s+in\\b)",
+    "g"
   );
   return re.test(text);
 }

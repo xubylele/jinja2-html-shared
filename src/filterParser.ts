@@ -12,16 +12,28 @@ export interface IdentifierMatch {
  * `{{ ... }}` or `{% ... %}` expression. Returns null otherwise.
  */
 export function identifierAtOffset(text: string, offset: number): IdentifierMatch | null {
-  if (offset < 0 || offset > text.length) { return null; }
-  if (!isInsideJinjaExpr(text, offset)) { return null; }
+  if (offset < 0 || offset > text.length) {
+    return null;
+  }
+  if (!isInsideJinjaExpr(text, offset)) {
+    return null;
+  }
 
   const isIdent = (ch: string) => /[A-Za-z0-9_]/.test(ch);
   let start = offset;
-  while (start > 0 && isIdent(text[start - 1])) { start--; }
+  while (start > 0 && isIdent(text[start - 1])) {
+    start--;
+  }
   let end = offset;
-  while (end < text.length && isIdent(text[end])) { end++; }
-  if (start === end) { return null; }
-  if (!/[A-Za-z_]/.test(text[start])) { return null; }
+  while (end < text.length && isIdent(text[end])) {
+    end++;
+  }
+  if (start === end) {
+    return null;
+  }
+  if (!/[A-Za-z_]/.test(text[start])) {
+    return null;
+  }
   return { name: text.slice(start, end), offset: start, length: end - start };
 }
 
@@ -31,24 +43,32 @@ export function identifierAtOffset(text: string, offset: number): IdentifierMatc
  */
 export function filterAtOffset(text: string, offset: number): IdentifierMatch | null {
   const ident = identifierAtOffset(text, offset);
-  if (!ident) { return null; }
+  if (!ident) {
+    return null;
+  }
 
   let i = ident.offset - 1;
-  while (i >= 0 && /\s/.test(text[i])) { i--; }
-  if (i < 0 || text[i] !== '|') { return null; }
+  while (i >= 0 && /\s/.test(text[i])) {
+    i--;
+  }
+  if (i < 0 || text[i] !== "|") {
+    return null;
+  }
   // Reject `||` (logical-or in expressions) — a filter pipe is a single `|`.
-  if (i > 0 && text[i - 1] === '|') { return null; }
+  if (i > 0 && text[i - 1] === "|") {
+    return null;
+  }
 
   return ident;
 }
 
 function isInsideJinjaExpr(text: string, offset: number): boolean {
   const opens = [
-    { tok: '{{', close: '}}' },
-    { tok: '{%', close: '%}' },
+    { tok: "{{", close: "}}" },
+    { tok: "{%", close: "%}" },
   ];
   let bestOpen = -1;
-  let bestClose = '';
+  let bestClose = "";
   for (const { tok, close } of opens) {
     const idx = text.lastIndexOf(tok, offset - 1);
     if (idx > bestOpen) {
@@ -56,8 +76,12 @@ function isInsideJinjaExpr(text: string, offset: number): boolean {
       bestClose = close;
     }
   }
-  if (bestOpen < 0) { return false; }
+  if (bestOpen < 0) {
+    return false;
+  }
   const closeIdx = text.indexOf(bestClose, bestOpen + 2);
-  if (closeIdx < 0) { return false; }
+  if (closeIdx < 0) {
+    return false;
+  }
   return offset >= bestOpen + 2 && offset <= closeIdx;
 }

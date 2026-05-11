@@ -1,8 +1,8 @@
-import nunjucks from 'nunjucks';
+import nunjucks from "nunjucks";
 
 nunjucks.installJinjaCompat();
 
-export type PlaceholderMode = 'inline' | 'badge' | 'hidden';
+export type PlaceholderMode = "inline" | "badge" | "hidden";
 
 export interface RenderResult {
   html: string;
@@ -21,7 +21,7 @@ function collectUsedRoots(content: string): string[] {
   let match: RegExpExecArray | null;
 
   while ((match = varRegex.exec(content)) !== null) {
-    roots.push(match[1].split('.')[0]);
+    roots.push(match[1].split(".")[0]);
   }
 
   return [...new Set(roots)];
@@ -47,10 +47,7 @@ export function findUsedVariables(content: string): string[] {
   return collectUsedRoots(content);
 }
 
-export function findMissingVariables(
-  content: string,
-  context: Record<string, unknown>
-): string[] {
+export function findMissingVariables(content: string, context: Record<string, unknown>): string[] {
   const used = collectUsedRoots(content);
   const defined = collectLocallyDefined(content);
   return used.filter((v) => !defined.has(v) && !(v in context));
@@ -59,8 +56,8 @@ export function findMissingVariables(
 function addJinjaHelpers(context: Record<string, unknown>): Record<string, unknown> {
   const enriched = { ...context };
 
-  if (!('now' in enriched)) {
-    enriched['now'] = () => new Date();
+  if (!("now" in enriched)) {
+    enriched["now"] = () => new Date();
   }
 
   return enriched;
@@ -70,7 +67,7 @@ function resolveMode(opts: RenderOptions): PlaceholderMode {
   if (opts.placeholderMode) {
     return opts.placeholderMode;
   }
-  return opts.highlightMissing ? 'inline' : 'hidden';
+  return opts.highlightMissing ? "inline" : "hidden";
 }
 
 export function renderTemplate(
@@ -86,7 +83,7 @@ export function renderTemplate(
 
   const safeContext: Record<string, unknown> = addJinjaHelpers({ ...context });
   for (const v of missing) {
-    safeContext[v] = mode === 'hidden' ? '' : `<<MISSING:${v}>>`;
+    safeContext[v] = mode === "hidden" ? "" : `<<MISSING:${v}>>`;
   }
 
   let html: string;
@@ -96,7 +93,7 @@ export function renderTemplate(
     html = content;
   }
 
-  if (mode !== 'hidden') {
+  if (mode !== "hidden") {
     html = html.replace(
       /&lt;&lt;MISSING:(\w+)&gt;&gt;/g,
       (_match, name: string) =>

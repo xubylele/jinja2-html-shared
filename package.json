@@ -15,9 +15,10 @@
     "dist"
   ],
   "scripts": {
+    "format": "prettier --write .",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build",
+    "prepare": "npm run format && npm run clean && npm run build",
     "test": "jest --runInBand",
     "test:ci": "jest --runInBand --ci",
     "changeset": "changeset",
@@ -32,8 +33,9 @@
     "@changesets/cli": "^2.31.0",
     "@types/jest": "^30.0.0",
     "@types/nunjucks": "^3.2.6",
-    "babel-jest": "^30.3.0",
-    "jest": "^30.3.0",
+    "babel-jest": "^30.4.1",
+    "jest": "^30.4.2",
+    "prettier": "^3.8.3",
     "typescript": "^6.0.3"
   },
   "dependencies": {

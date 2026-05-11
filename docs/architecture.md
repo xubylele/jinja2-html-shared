@@ -15,11 +15,11 @@ The architectural goal is simple: the same Jinja2 input must produce the same `u
 
 ## Layer Map
 
-| Layer | Files | Responsibility |
-| ------- | ------- | ---------------- |
-| Public API | `src/index.ts` | Barrel — re-exports `extractVariables`, `analyzeNestedStructures`, `extractVariableName` |
-| Analyzers | `src/variableAnalyzer.ts` | Regex extraction of used/set variables; nested structure walker |
-| Helpers | `src/diagnosticMessage.ts` | Pure string parser for diagnostic messages |
+| Layer      | Files                      | Responsibility                                                                           |
+| ---------- | -------------------------- | ---------------------------------------------------------------------------------------- |
+| Public API | `src/index.ts`             | Barrel — re-exports `extractVariables`, `analyzeNestedStructures`, `extractVariableName` |
+| Analyzers  | `src/variableAnalyzer.ts`  | Regex extraction of used/set variables; nested structure walker                          |
+| Helpers    | `src/diagnosticMessage.ts` | Pure string parser for diagnostic messages                                               |
 
 ## Data Flow
 
@@ -41,12 +41,12 @@ No state crosses calls. Every export is a pure function `string → value`.
 
 ## Boundaries
 
-| Allowed in this package | Forbidden |
-| -------- | -------- |
-| String inputs, plain return values | `vscode` API (would break Pro consumer's bundle) |
-| Pure regex / string ops | File I/O, network, child processes |
-| `Set`, `Map`, regex, `matchAll` | Runtime npm dependencies — keep `dependencies: {}` empty |
-| Adding new exports | Changing existing export signatures (versioning instead) |
+| Allowed in this package            | Forbidden                                                |
+| ---------------------------------- | -------------------------------------------------------- |
+| String inputs, plain return values | `vscode` API (would break Pro consumer's bundle)         |
+| Pure regex / string ops            | File I/O, network, child processes                       |
+| `Set`, `Map`, regex, `matchAll`    | Runtime npm dependencies — keep `dependencies: {}` empty |
+| Adding new exports                 | Changing existing export signatures (versioning instead) |
 
 ## Why This Package Exists
 
