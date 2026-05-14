@@ -35,4 +35,4 @@ jobs:
           node -p "require('./package.json').version"
 
       - name: Publish to npm
-        run: pnpm publish --access public --provenance
+        run: pnpm publish --access public --provenance --no-git-checks
