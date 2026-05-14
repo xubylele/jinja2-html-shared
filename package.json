@@ -8,6 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/xubylele/jinja2-html-shared.git"
   },
+  "packageManager": "pnpm@11.0.8",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,15 +16,16 @@
     "dist"
   ],
   "scripts": {
+    "format": "prettier --write .",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build",
+    "prepare": "pnpm format && pnpm clean && pnpm build",
     "test": "jest --runInBand",
     "test:ci": "jest --runInBand --ci",
     "changeset": "changeset",
-    "changeset:check": "node -e \"const f=require('fs').readdirSync('.changeset').filter(n=>n.endsWith('.md')&&n!=='README.md');if(!f.length){process.stderr.write('No changeset found. Run: npm run changeset\\n');process.exit(1)}else{console.log('Changesets found:',f.join(', '))}\"",
-    "version": "changeset version && npm install",
-    "publish:public": "npm publish --access public"
+    "changeset:check": "node -e \"const f=require('fs').readdirSync('.changeset').filter(n=>n.endsWith('.md')&&n!=='README.md');if(!f.length){process.stderr.write('No changeset found. Run: pnpm changeset\\n');process.exit(1)}else{console.log('Changesets found:',f.join(', '))}\"",
+    "version": "changeset version && pnpm install",
+    "publish:public": "pnpm publish --access public"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -32,8 +34,9 @@
     "@changesets/cli": "^2.31.0",
     "@types/jest": "^30.0.0",
     "@types/nunjucks": "^3.2.6",
-    "babel-jest": "^30.3.0",
-    "jest": "^30.3.0",
+    "babel-jest": "^30.4.1",
+    "jest": "^30.4.2",
+    "prettier": "^3.8.3",
     "typescript": "^6.0.3"
   },
   "dependencies": {

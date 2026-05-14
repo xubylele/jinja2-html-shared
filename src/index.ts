@@ -1,5 +1,5 @@
-export { extractVariables, analyzeNestedStructures } from './variableAnalyzer';
-export { extractVariableName } from './diagnosticMessage';
+export { extractVariables, analyzeNestedStructures } from "./variableAnalyzer";
+export { extractVariableName } from "./diagnosticMessage";
 export {
   scanTemplateRelations,
   extractMacroDefinitions,
@@ -7,7 +7,7 @@ export {
   extractMacroCalls,
   calculateNestingDepth,
   isVariableUsed,
-} from './templateRelations';
+} from "./templateRelations";
 export type {
   TemplateRelations,
   TemplatePathOccurrence,
@@ -18,21 +18,19 @@ export type {
   MacroParam,
   BlockDefinition,
   MacroCall,
-} from './templateRelations';
-export { resolveTemplatePath } from './templatePath';
+} from "./templateRelations";
+export { resolveTemplatePath } from "./templatePath";
+export { renderTemplate, findMissingVariables, findUsedVariables } from "./templateRenderer";
+export type { RenderResult, RenderOptions, PlaceholderMode } from "./templateRenderer";
+export { FILTER_DOCS, getFilterDoc, listFilterNames } from "./filterDocs";
+export type { FilterDoc } from "./filterDocs";
+export { filterAtOffset, identifierAtOffset } from "./filterParser";
+export type { IdentifierMatch } from "./filterParser";
 export {
-  renderTemplate,
-  findMissingVariables,
-} from './templateRenderer';
-export type { RenderResult, RenderOptions } from './templateRenderer';
-export {
-  FILTER_DOCS,
-  getFilterDoc,
-  listFilterNames,
-} from './filterDocs';
-export type { FilterDoc } from './filterDocs';
-export {
-  filterAtOffset,
-  identifierAtOffset,
-} from './filterParser';
-export type { IdentifierMatch } from './filterParser';
+  formatMacroSignatureLabel,
+  formatMacroSnippet,
+  parseMacroCallContext,
+  isInPrintContext,
+  computeActiveParameter,
+} from "./macro-intellisense";
+export type { MacroCallContext } from "./macro-intellisense";

@@ -23,19 +23,19 @@ Re-exports `extractVariables`, `analyzeNestedStructures` from `./variableAnalyze
 
 ### Exports
 
-| Name | Signature | Description |
-| ------ | ---------- | ------------- |
-| `extractVariables` | `(text: string) => { usedVariables: string[]; setVariables: string[] }` | Scans `{{ var }}` (used), `{% set var = %}` and `{% for var in %}` (set). Dotted access is reduced to the root identifier. Both arrays are de-duplicated |
-| `analyzeNestedStructures` | `(text: string) => string[]` | Walks `{% for | if | set %}` opens and `{% endfor | endif %}` closes; collects identifiers introduced by `for` and `set`. Returns the flat list (no scope info) |
+| Name                      | Signature                                                               | Description                                                                                                                                              |
+| ------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | -------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `extractVariables`        | `(text: string) => { usedVariables: string[]; setVariables: string[] }` | Scans `{{ var }}` (used), `{% set var = %}` and `{% for var in %}` (set). Dotted access is reduced to the root identifier. Both arrays are de-duplicated |
+| `analyzeNestedStructures` | `(text: string) => string[]`                                            | Walks `{% for                                                                                                                                            | if  | set %}`opens and`{% endfor | endif %}`closes; collects identifiers introduced by`for`and`set`. Returns the flat list (no scope info) |
 
 ### Regex Reference
 
-| Regex | Captures |
-| ------ | -------- |
+| Regex                              | Captures                                   |
+| ---------------------------------- | ------------------------------------------ | ------------ | -------------- | ------ | ---------------------------------- |
 | `/\{\{\s*(\w+(?:\.\w+)*)\s*\}\}/g` | Variable usage with optional dotted access |
-| `/\{%\s*set\s+(\w+)\s*=/g` | `{% set name = ... %}` |
-| `/\{%\s*for\s+(\w+)\s+in\s+/g` | `{% for name in ... %}` |
-| `/\{%\s*(for|if|set)\s+(\w+)|\{%\s*end(for|if)/g` | Open/close blocks for nesting walk |
+| `/\{%\s*set\s+(\w+)\s*=/g`         | `{% set name = ... %}`                     |
+| `/\{%\s*for\s+(\w+)\s+in\s+/g`     | `{% for name in ... %}`                    |
+| `/\{%\s\*(for                      | if                                         | set)\s+(\w+) | \{%\s\*end(for | if)/g` | Open/close blocks for nesting walk |
 
 ### Dependencies
 
@@ -56,8 +56,8 @@ Re-exports `extractVariables`, `analyzeNestedStructures` from `./variableAnalyze
 
 ### Exports
 
-| Name | Signature | Description |
-| ------ | ---------- | ------------- |
+| Name                  | Signature                                       | Description                                               |
+| --------------------- | ----------------------------------------------- | --------------------------------------------------------- |
 | `extractVariableName` | `(diagnosticMessage: string) => string \| null` | Returns the first `'…'` quoted token, or `null` if absent |
 
 ### Dependencies

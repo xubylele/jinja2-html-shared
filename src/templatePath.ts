@@ -3,9 +3,13 @@
 // (Pro extension) probes the filesystem to pick the first that exists.
 
 function normalizeTemplateKey(raw: string): string {
-  let s = raw.replace(/\\/g, '/');
-  while (s.startsWith('./')) { s = s.slice(2); }
-  while (s.startsWith('/')) { s = s.slice(1); }
+  let s = raw.replace(/\\/g, "/");
+  while (s.startsWith("./")) {
+    s = s.slice(2);
+  }
+  while (s.startsWith("/")) {
+    s = s.slice(1);
+  }
   return s;
 }
 
@@ -25,10 +29,12 @@ function normalizeTemplateKey(raw: string): string {
 export function resolveTemplatePath(
   templateRel: string,
   fromTemplateAbs: string | null,
-  roots: string[],
+  roots: string[]
 ): string[] {
   const rel = normalizeTemplateKey(templateRel);
-  if (rel.length === 0) { return []; }
+  if (rel.length === 0) {
+    return [];
+  }
 
   const candidates: string[] = [];
   const seen = new Set<string>();
@@ -41,7 +47,9 @@ export function resolveTemplatePath(
 
   for (const root of roots) {
     const base = stripTrailingSlash(toPosix(root));
-    if (base.length === 0) { continue; }
+    if (base.length === 0) {
+      continue;
+    }
     push(`${base}/${rel}`);
   }
 
@@ -56,18 +64,24 @@ export function resolveTemplatePath(
 }
 
 function toPosix(p: string): string {
-  return p.replace(/\\/g, '/');
+  return p.replace(/\\/g, "/");
 }
 
 function stripTrailingSlash(p: string): string {
   let end = p.length;
-  while (end > 1 && p[end - 1] === '/') { end--; }
+  while (end > 1 && p[end - 1] === "/") {
+    end--;
+  }
   return p.slice(0, end);
 }
 
 function posixDirname(p: string): string {
-  const idx = p.lastIndexOf('/');
-  if (idx < 0) { return ''; }
-  if (idx === 0) { return '/'; }
+  const idx = p.lastIndexOf("/");
+  if (idx < 0) {
+    return "";
+  }
+  if (idx === 0) {
+    return "/";
+  }
   return p.slice(0, idx);
 }

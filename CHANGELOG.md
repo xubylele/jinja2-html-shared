@@ -41,7 +41,6 @@
 ### Minor Changes
 
 - ✨ Add template-relation analyzers for Cross-File Variable Tracking
-
   - `scanTemplateRelations(text)` — extracts `{% extends %}`, `{% include %}`, `{% import … as … %}`, and `{% from … import … %}` occurrences with offsets.
   - `extractMacroDefinitions(text)` — extracts `{% macro name(params) %}` definitions; also feeds the upcoming Macro IntelliSense feature.
   - `resolveTemplatePath(rel, fromAbs, roots)` — pure path resolution returning candidate absolute paths in priority order (no I/O).
@@ -56,17 +55,14 @@
 - 565de43: Backend-aware analyzer foundation + automated versioning workflow.
 
   **New exports** (`src/backendScanner.ts` → `src/index.ts`):
-
   - `scanBackendOccurrences(text, lang)` — pure scan that returns every backend-side variable occurrence (name + offset + length) keyed by normalized template path. Recognizes Flask `render_template`, Django `render`, FastAPI `TemplateResponse`, Jinja2 standalone `env.get_template(...).render(...)`, Express / Nunjucks `.render('...', { ... })`. Replaces what was previously a names-only scan inside the Pro extension.
   - `identifierAtOffset(text, offset)` — returns the identifier under a given offset inside a `{{ … }}` / `{% … %}` expression (returns `null` outside). Used by Pro's hover, code-action, and definition providers to resolve the variable under the cursor.
   - `normalizeTemplateKey(raw)` — exported so consumers can match template paths against the index using the same canonicalization the scanner uses.
   - New types: `BackendLang` (`'py' | 'js'`), `BackendVarOccurrence` (`{ name, offset, length }`).
 
   **Tooling**
-
   - Adopt [Changesets](https://github.com/changesets/changesets) for versioning, matching the free and Pro repos. `npm run changeset` records a change; `npm run version` consumes pending changesets and bumps `package.json` + writes `CHANGELOG.md`. `npm run changeset:check` fails when a PR has no pending changeset.
   - `CLAUDE.md` Releasing section rewritten to document the new flow.
 
   **Internal**
-
   - Adds the `.claude/skills/jinja2-enhance-shared.skill` Claude skill bundle used by the maintainer's tooling. No runtime impact.
