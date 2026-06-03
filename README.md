@@ -1,6 +1,6 @@
 # @xubylele/jinja2-enhanced-shared
 
-Pure utilities shared between the **Jinja2 Enhance** free extension ([`xubylele/jinja2-html-enhancer`](https://github.com/xubylele/jinja2-html-enhancer)) and its Pro counterpart.
+Pure utilities used by the **Jinja2 Enhance** free extension ([`xubylele/jinja2-html-enhancer`](https://github.com/xubylele/jinja2-html-enhancer)).
 
 No `vscode` imports. No I/O. Just regex helpers over template strings.
 
