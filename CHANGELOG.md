@@ -1,5 +1,19 @@
 # jinja2-enhanced-shared
 
+## 0.5.0
+
+### Minor Changes
+
+- 29d189e: Add `FILTER_DOCS`, `getFilterDoc`, `listFilterNames` for the 51 built-in Jinja2 filters (signature + i18n description key + example), plus pure parsers `filterAtOffset` / `identifierAtOffset` for locating filter identifiers in template text. Consumed by the Filter Docs on Hover feature now graduating from Pro to Free.
+- 3f8cba8: Add pure macro IntelliSense helpers (`formatMacroSignatureLabel`, `formatMacroSnippet`, `parseMacroCallContext`, `isInPrintContext`, `computeActiveParameter`) shared by the free single-file macro IntelliSense and Pro's cross-file provider.
+- fcf71cf: New: `findUsedVariables` helper and `placeholderMode` option on `renderTemplate` (`inline` / `badge` / `hidden`). `RenderResult` now also returns `usedVariables`, and missing-variable spans carry `data-var` + `data-mode` for richer webview rendering. Fully backward-compatible with the legacy `highlightMissing` flag.
+
+### Patch Changes
+
+- acf48f4: Migrated from npm to pnpm@11.0.8 across the whole workspace for improved supply-chain security. npm's dependency-resolution model has been a recurring attack vector — most recently demonstrated by the [TanStack npm supply-chain compromise](https://tanstack.com/blog/npm-supply-chain-compromise-postmortem) (May 2026), where malicious lifecycle scripts smuggled via npm install harvested credentials and self-propagated across 42 packages. pnpm's strict content-addressable store, symlinked node_modules, and build-scripts-blocked-by-default (`ERR_PNPM_IGNORED_BUILDS`) provide stronger guarantees against this class of attack.
+
+  All npm scripts, CI workflows, and changeset-version hooks updated accordingly. No functional changes.
+
 ## 0.4.3
 
 ### Patch Changes
