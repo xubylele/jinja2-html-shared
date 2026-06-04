@@ -1,5 +1,5 @@
-// Pure helpers for macro IntelliSense. Shared by the free single-file
-// provider and Pro's cross-file provider. No vscode imports.
+// Pure helpers for macro IntelliSense. Shared by single-file and cross-file
+// providers. No vscode imports.
 
 import type { MacroParam } from "./templateRelations";
 

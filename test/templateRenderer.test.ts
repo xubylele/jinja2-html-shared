@@ -1,3 +1,6 @@
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 import { renderTemplate, findMissingVariables, findUsedVariables } from "../src/templateRenderer";
 
 describe("templateRenderer", () => {
@@ -78,6 +81,44 @@ describe("templateRenderer", () => {
       const broken = "{% for %}oops";
       const result = renderTemplate(broken, {});
       expect(result.html).toBe(broken);
+    });
+
+    it("resolves {% extends %} when templateRoots is provided", () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "jinja2-preview-"));
+      try {
+        fs.writeFileSync(
+          path.join(tmpDir, "base.html"),
+          "<html><body>{% block content %}{% endblock %}</body></html>"
+        );
+        const child = '{% extends "base.html" %}{% block content %}HELLO{% endblock %}';
+        const result = renderTemplate(child, {}, { templateRoots: [tmpDir] });
+        expect(result.html).toBe("<html><body>HELLO</body></html>");
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true });
+      }
+    });
+
+    it("resolves {% include %} when templateRoots is provided", () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "jinja2-preview-"));
+      try {
+        fs.writeFileSync(path.join(tmpDir, "partial.html"), "<span>{{ title }}</span>");
+        const parent = '{% include "partial.html" %}';
+        const result = renderTemplate(parent, { title: "Test" }, { templateRoots: [tmpDir] });
+        expect(result.html).toBe("<span>Test</span>");
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true });
+      }
+    });
+
+    it("falls back gracefully when extends target is missing", () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "jinja2-preview-"));
+      try {
+        const child = '{% extends "nonexistent.html" %}{% block content %}X{% endblock %}';
+        const result = renderTemplate(child, {}, { templateRoots: [tmpDir] });
+        expect(result.html).toBe(child);
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true });
+      }
     });
 
     it("injects now() global when absent", () => {

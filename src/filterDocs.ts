@@ -1,5 +1,5 @@
 // Pure data + lookup for built-in Jinja2 filter documentation.
-// Consumers (free / Pro extensions) resolve `descriptionKey` via their own i18n layer.
+// Consumers resolve `descriptionKey` via their own i18n layer.
 
 export interface FilterDoc {
   name: string;
