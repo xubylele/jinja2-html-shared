@@ -1,7 +1,7 @@
 {
   "name": "@xubylele/jinja2-enhanced-shared",
   "version": "0.5.1",
-  "description": "Shared pure utilities used by the Jinja2 Enhance free and Pro VS Code extensions.",
+  "description": "Pure utilities used by the Jinja2 Enhance VS Code extension.",
   "license": "MIT",
   "author": "Xubylele",
   "repository": {

@@ -1,6 +1,6 @@
 // Pure template-path resolution. No fs, no path module — string ops only.
 // Returns a list of candidate absolute paths in priority order; the caller
-// (Pro extension) probes the filesystem to pick the first that exists.
+// probes the filesystem to pick the first that exists.
 
 function normalizeTemplateKey(raw: string): string {
   let s = raw.replace(/\\/g, "/");

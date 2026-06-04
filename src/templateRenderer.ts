@@ -13,6 +13,8 @@ export interface RenderResult {
 export interface RenderOptions {
   highlightMissing?: boolean;
   placeholderMode?: PlaceholderMode;
+  /** Absolute filesystem paths used to resolve {% extends %} and {% include %} tags. */
+  templateRoots?: string[];
 }
 
 function collectUsedRoots(content: string): string[] {
@@ -79,7 +81,10 @@ export function renderTemplate(
   const usedVariables = findUsedVariables(content);
   const missing = findMissingVariables(content, context);
 
-  const env = new nunjucks.Environment(null, { throwOnUndefined: false });
+  const loader = opts.templateRoots?.length
+    ? new nunjucks.FileSystemLoader(opts.templateRoots, { noCache: true })
+    : null;
+  const env = new nunjucks.Environment(loader, { throwOnUndefined: false });
 
   const safeContext: Record<string, unknown> = addJinjaHelpers({ ...context });
   for (const v of missing) {

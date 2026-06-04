@@ -1,6 +1,6 @@
 # Architecture
 
-`jinja2-enhanced-shared` is a pure-TypeScript utility package. It owns the **language-level analyzers** (regex extraction, scope walking, message parsing) that both the free and Pro extensions need to agree on.
+`jinja2-enhanced-shared` is a pure-TypeScript utility package. It owns the **language-level analyzers** (regex extraction, scope walking, message parsing) consumed by the free extension.
 
 The architectural goal is simple: the same Jinja2 input must produce the same `usedVariables` / `setVariables` answer in every consumer. So the analyzers live here, behind a stable API, with no environment-specific imports.
 
@@ -24,7 +24,7 @@ The architectural goal is simple: the same Jinja2 input must produce the same `u
 ## Data Flow
 
 ```makefile
-Consumer (free or Pro extension)
+Consumer (free extension)
   └─ imports { extractVariables, ... } from 'jinja2-enhanced-shared'
        └─ passes a raw template string (the document text)
             └─ extractVariables(text)
@@ -43,21 +43,18 @@ No state crosses calls. Every export is a pure function `string → value`.
 
 | Allowed in this package            | Forbidden                                                |
 | ---------------------------------- | -------------------------------------------------------- |
-| String inputs, plain return values | `vscode` API (would break Pro consumer's bundle)         |
+| String inputs, plain return values | `vscode` API (would break the extension bundle)          |
 | Pure regex / string ops            | File I/O, network, child processes                       |
 | `Set`, `Map`, regex, `matchAll`    | Runtime npm dependencies — keep `dependencies: {}` empty |
 | Adding new exports                 | Changing existing export signatures (versioning instead) |
 
 ## Why This Package Exists
 
-1. **Single source of truth.** A regex tweak here lands in both extensions on next bump. No drift.
-2. **Pro can extend it.** Pro adds backend intelligence, cross-file resolution, etc. — but reuses the primitive analyzers from here.
-3. **Testable in isolation.** Pure functions; no vscode mock, no fixtures with extension hosts.
-4. **Free extension stays MIT.** This package is intentionally minimal. Larger logic that gates Pro features lives in the Pro repo, not here.
+1. **Single source of truth.** A regex tweak here lands in the extension on next bump. No drift.
+2. **Testable in isolation.** Pure functions; no vscode mock, no fixtures with extension hosts.
+3. **Extension stays MIT.** This package is intentionally minimal — no runtime VS Code dependencies.
 
 ## Known Constraints / Tech Debt
 
 1. **`extractVariables` only handles dotted access at the root** (`user.name` → `user`). Computed access (`items[0]`) and filters inside `{{ }}` are not parsed
 2. **`analyzeNestedStructures` uses a flat stack** — does not associate a defined variable with its enclosing block. Callers cannot ask "which variables are defined in this `for`?"
-3. **No `{% block %}` / `{% extends %}` awareness** — cross-file template inheritance is intentionally a Pro concern (see pro repo)
-4. **No tests in this package yet.** Tests currently live in the consumer (`jinja2-html-enhancer/test/`) — should be moved here so the package can be validated independently
