@@ -1,5 +1,11 @@
 # jinja2-enhanced-shared
 
+## 0.5.2
+
+### Patch Changes
+
+- 9f5fbeb: Template preview now resolves `{% extends %}` and `{% include %}` tags when `templateRoots` is passed to `renderTemplate`. Previously, templates using inheritance rendered as raw Jinja2 source.
+
 ## 0.5.0
 
 ### Minor Changes
